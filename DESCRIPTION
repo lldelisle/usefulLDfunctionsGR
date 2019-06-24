@@ -1,0 +1,25 @@
+Package: usefulLDfunctionsGR
+Title: Functions That I Use Regularly Which depends on GenomicRanges
+Version: 0.0.1
+Authors@R: 
+    person(given = "Lucille",
+           family = "Lopez-Delisle",
+           role = c("aut", "cre"),
+           email = "lucille.delisle@epfl.ch",
+           comment = c(ORCID = "0000-0002-1964-4960"))
+Description: Useful functions to manipulate GRanges
+License: CC BY 4.0
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
+Imports: 
+  usefulLDfunctions,
+  GenomicRanges,
+  rtracklayer,
+  stats,
+  grDevices,
+  utils
+Suggests:
+    IRanges,
+    S4Vectors,
+    testthat
