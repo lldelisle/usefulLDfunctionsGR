@@ -2,8 +2,8 @@
 Functions That I Use Regularly Which depends on GenomicRanges
 
 ## Installation
-This package depends on GenomicRanges, rtracklayer, usefulLDfunctions, stats, grDevices, utils.
-If usefulLDfunctions, and/or GenomicRanges and/or rtracklayer are not installed on your R see Installation of dependencies section.
+This package depends on GenomicRanges, rtracklayer, usefulLDfunctions, stats, grDevices, utils, combinat.
+If usefulLDfunctions, and/or GenomicRanges and/or rtracklayer and/or combinat are not installed on your R see Installation of dependencies section.
 
 The easiest way to install usefulLDfunctions is using devtools::install_github() from R:
 ```
@@ -26,6 +26,7 @@ As the installation of Bioconductor package depends on the R version you have, I
 library(usefulLDfunctions)
 safelyLoadAPackageInCRANorBioconductor("GenomicRanges")
 safelyLoadAPackageInCRANorBioconductor("rtracklayer")
+safelyLoadAPackageInCRANorBioconductor("combinat")
 ```
 
 ## Issues

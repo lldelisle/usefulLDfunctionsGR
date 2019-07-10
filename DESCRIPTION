@@ -1,13 +1,13 @@
 Package: usefulLDfunctionsGR
 Title: Functions That I Use Regularly Which depends on GenomicRanges
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: 
     person(given = "Lucille",
            family = "Lopez-Delisle",
            role = c("aut", "cre"),
            email = "lucille.delisle@epfl.ch",
            comment = c(ORCID = "0000-0002-1964-4960"))
-Description: Useful functions to manipulate GRanges
+Description: Useful functions to manipulate GRanges and do overlaps.
 License: CC BY 4.0
 Encoding: UTF-8
 LazyData: true
@@ -16,6 +16,7 @@ Imports:
   usefulLDfunctions,
   GenomicRanges,
   rtracklayer,
+  combinat,
   stats,
   grDevices,
   utils
