@@ -30,3 +30,10 @@ test_that("grSortedSimplifiedFromNarrowPeak gives what is expected", {
   load(file.path(tests_dir, "simplifiedOrderedTestNarrowPeak.Rdata"))
   expect_equal(grSortedSimplifiedFromNarrowPeak(test_bed), expectedResult)
 })
+
+test_that("narrowPeakDFFromGR gives what is expected", {
+  tests_dir <- system.file("tests", package = "usefulLDfunctionsGR")
+  load(file.path(tests_dir, "simplifiedOrderedTestNarrowPeak.Rdata"))
+  load(file.path(tests_dir, "narrowPeakDF.Rdata"))
+  expect_equal(narrowPeakDFFromGR(expectedResult), narrowPeakDF)
+})

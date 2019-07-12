@@ -1,6 +1,6 @@
 Package: usefulLDfunctionsGR
 Title: Functions That I Use Regularly Which depends on GenomicRanges
-Version: 0.0.2
+Version: 0.0.4
 Authors@R: 
     person(given = "Lucille",
            family = "Lopez-Delisle",

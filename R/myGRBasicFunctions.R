@@ -34,6 +34,9 @@ grSortedSimplifiedFromNarrowPeak <- function(fn){
   colnames(df) <- c("chr", "start", "end", "name",
                     "score", "strand", "signalValue",
                     "pValue", "qValue", "relativeSummit")
+  # The narrowPeak file is 0-based half open:
+  df$start <- df$start + 1
+  # The df is now 1-based closed as GRanges.
   # I want to have only one entry per peak by default
   # you may have multiple summits for one peak
   dfA <- stats::aggregate(x = list(score = df$score),
@@ -50,6 +53,26 @@ grSortedSimplifiedFromNarrowPeak <- function(fn){
   myAwithMoreColsGR <- makeGRangesFromDataFrame(dfAwithMoreCols,
                                                 keep.extra.columns = T)
   return(myAwithMoreColsGR)
+}
+
+#' create a data.frame from a GenomicRanges object from a narrowPeak
+#'
+#' @param gr a GenomicRanges which contains all information for writting a narrowPeak
+#' @return a data.frame with intervalls 0-based half open, ready to be written in a file.
+#' @export
+narrowPeakDFFromGR <- function(gr){
+  df <- base::as.data.frame(gr)[, c("seqnames", "start", "end",
+                                    "name", "score", "strand",
+                                    "signalValue", "pValue",
+                                    "qValue", "relativeSummit")]
+  # This df is 1-based closed.
+  df$start <- df$start - 1
+  # df is now 0-based half-open
+  # The strand is "*" and should be "."
+  # This is a factor so I need to convert it to string
+  df$strand <- as.character(df$strand)
+  df$strand[df$strand == "*"] <- "."
+  return(df)
 }
 
 #' create a GenomicRanges object from a BED
