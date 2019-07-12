@@ -16,9 +16,11 @@ getTSSinUCSCFormatFromEnsemblGTF <- function(myGTF){
   gtf <- readGFF(myGTF, filter = list(type = "exon"))
   # The gtf format is like the GRanges format (1-based closed intervals)
   # The chromosome names in UCSC format begins with chr
-  gtf$seqid <- paste0("chr", gtf$seqid)
-  # The mitochondrial chr is named MT in ensembl and chrM in UCSC
-  gtf$seqid[gtf$seqid == "chrMT"] <- "chrM"
+  if (substr(gtf$seqid[1], 1, 3) != "chr"){
+    gtf$seqid <- paste0("chr", gtf$seqid)
+    # The mitochondrial chr is named MT in ensembl and chrM in UCSC
+    gtf$seqid[gtf$seqid == "chrMT"] <- "chrM"
+  }
   gtfgr <- makeGRangesFromDataFrame(gtf, keep.extra.columns = T)
   tss <- resize(subset(gtfgr, exon_number == "1"), width = 1)
   return(tss)
