@@ -22,6 +22,7 @@ getTSSinUCSCFormatFromEnsemblGTF <- function(myGTF){
     gtf$seqid[gtf$seqid == "chrMT"] <- "chrM"
   }
   gtfgr <- makeGRangesFromDataFrame(gtf, keep.extra.columns = T)
-  tss <- resize(subset(gtfgr, exon_number == "1"), width = 1)
+  tss <- tryCatch(resize(subset(gtfgr, exon_number == "1"), width = 1),
+                  resize(BiocGeneric::subset(gtfgr, exon_number == "1"), width = 1))
   return(tss)
 }
