@@ -4,6 +4,7 @@
 #' @return a Genomic Range with all TSS (entries might be duplicated) in UCSC format (with "chr")
 #' @importFrom rtracklayer readGFF
 #' @importFrom GenomicRanges makeGRangesFromDataFrame resize
+#' @importFrom BiocGeneric subset
 #' @export
 #' @examples
 #' \dontrun{
