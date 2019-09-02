@@ -4,7 +4,7 @@
 #' @return a Genomic Range with all TSS (entries might be duplicated) in UCSC format (with "chr")
 #' @importFrom rtracklayer readGFF
 #' @importFrom GenomicRanges makeGRangesFromDataFrame resize
-#' @importFrom BiocGeneric subset
+#' @importFrom BiocGenerics subset
 #' @export
 #' @examples
 #' \dontrun{
@@ -24,6 +24,6 @@ getTSSinUCSCFormatFromEnsemblGTF <- function(myGTF){
   }
   gtfgr <- makeGRangesFromDataFrame(gtf, keep.extra.columns = T)
   tss <- tryCatch(resize(subset(gtfgr, exon_number == "1"), width = 1),
-                  resize(BiocGeneric::subset(gtfgr, exon_number == "1"), width = 1))
+                  resize(BiocGenerics::subset(gtfgr, exon_number == "1"), width = 1))
   return(tss)
 }
