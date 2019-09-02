@@ -24,6 +24,8 @@ getTSSinUCSCFormatFromEnsemblGTF <- function(myGTF){
   }
   gtfgr <- makeGRangesFromDataFrame(gtf, keep.extra.columns = T)
   tss <- tryCatch(resize(subset(gtfgr, exon_number == "1"), width = 1),
-                  resize(BiocGenerics::subset(gtfgr, exon_number == "1"), width = 1))
+                  error = function(e){
+                    resize(BiocGenerics::subset(gtfgr, exon_number == "1"), width = 1)
+                  })
   return(tss)
 }
