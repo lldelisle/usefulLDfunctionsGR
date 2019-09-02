@@ -3,6 +3,7 @@
 #' @param my2GRsToOverlap a GRangesList with 2 items to overlap
 #' @return a dataframe with 2 columns with colnames identicals to names of the input with the indices of the overlaps
 #' @importFrom GenomicRanges findOverlaps
+#' @importFrom BiocGenerics as.data.frame
 #' @export
 #' @examples
 #'gr1 <- GenomicRanges::GRanges(
@@ -20,7 +21,7 @@ overlap2GR <- function(my2GRsToOverlap){
   if (length(my2GRsToOverlap) != 2){
     stop("This is not a list with 2 items.")
   }
-  mAll <- as.data.frame(
+  mAll <- BiocGenerics::as.data.frame(
     as.matrix(
       GenomicRanges::findOverlaps(my2GRsToOverlap[[1]],
                                   my2GRsToOverlap[[2]])))
