@@ -1,6 +1,6 @@
 Package: usefulLDfunctionsGR
 Title: Functions That I Use Regularly Which depends on GenomicRanges
-Version: 0.0.6
+Version: 0.0.7
 Authors@R: 
     person(given = "Lucille",
            family = "Lopez-Delisle",
@@ -20,7 +20,8 @@ Imports:
   combinat,
   stats,
   grDevices,
-  utils
+  utils,
+  igraph
 Suggests:
     IRanges,
     S4Vectors,

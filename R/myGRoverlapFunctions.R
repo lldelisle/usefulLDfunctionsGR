@@ -29,6 +29,8 @@ overlap2GR <- function(my2GRsToOverlap){
   return(mAll)
 }
 
+### THIS IS VERY TIME CONSUMING IT WOULD GO FASTER WITH GRAPHS...
+
 #' Get a dataframe from all possible pairwise overlaps
 #' from a GRangesList where multiple overlaps are on the same line when possible.
 #' Or a list of dataframes of any combination using any items in the list
@@ -205,32 +207,39 @@ filterByScore <- function(myGRsToOverlap,
     nameI <- colnames(mAll)[i]
     mAllSF <- mAllSF[is.na(mAllSF[, nameI]) | !duplicated(mAllSF[, nameI]), ]
   }
-  # To compensate this bias, we will try to "rescue" the overlaps which have been deleted but exists.
+  # To compensate this bias, we will try to "rescue"
+  # the overlaps which have been deleted but exists.
   mAllSRescue <- mAllS
-  # We put in mAllSRescue all overlaps which are not using indices already present in the mAllSF
+  # We put in mAllSRescue all overlaps which are not using
+  # indices already present in the mAllSF
   for (i in 1:n){
-    nameI<-colnames(mAll)[i]
-    mAllSRescue<-mAllSRescue[is.na(mAllSRescue[, nameI]) | !mAllSRescue[, nameI] %in% mAllSF[, nameI], ]
+    nameI <- colnames(mAll)[i]
+    mAllSRescue <- mAllSRescue[is.na(mAllSRescue[, nameI]) |
+                      !mAllSRescue[, nameI] %in% mAllSF[, nameI], ]
   }
   # We remove the duplicated indices in the mAllSRescue
   for (i in 1:n){
     nameI <- colnames(mAll)[i]
-    mAllSRescue <- mAllSRescue[is.na(mAllSRescue[, nameI]) | !duplicated(mAllSRescue[, nameI]), ]
+    mAllSRescue <- mAllSRescue[is.na(mAllSRescue[, nameI]) |
+                        !duplicated(mAllSRescue[, nameI]), ]
   }
   # While there are still overlaps which could be added.
   # We redo the process.
-  while(nrow(mAllSRescue) > 0){
+  while (nrow(mAllSRescue) > 0){
     mAllSF <- rbind(mAllSF, mAllSRescue)
     mAllSRescue <- mAllS
-    # We put in mAllSRescue all overlaps which are not using indices already present in the mAllSF
+    # We put in mAllSRescue all overlaps which are not using
+    # indices already present in the mAllSF
     for (i in 1:n){
-      nameI<-colnames(mAll)[i]
-      mAllSRescue<-mAllSRescue[is.na(mAllSRescue[, nameI]) | !mAllSRescue[, nameI] %in% mAllSF[, nameI], ]
+      nameI <- colnames(mAll)[i]
+      mAllSRescue <- mAllSRescue[is.na(mAllSRescue[, nameI]) |
+                        !mAllSRescue[, nameI] %in% mAllSF[, nameI], ]
     }
     # We remove the duplicated indices in the mAllSRescue
     for (i in 1:n){
       nameI <- colnames(mAll)[i]
-      mAllSRescue <- mAllSRescue[is.na(mAllSRescue[, nameI]) | !duplicated(mAllSRescue[, nameI]), ]
+      mAllSRescue <- mAllSRescue[is.na(mAllSRescue[, nameI]) |
+                          !duplicated(mAllSRescue[, nameI]), ]
     }
   }
   # We now need to add the indices that are not present.
@@ -242,4 +251,85 @@ filterByScore <- function(myGRsToOverlap,
     mAllF <- merge(mAllF, temp.df, all = T)
   }
   return(mAllF[, setdiff(colnames(mAll), "score")])
+}
+
+#' Get a dataframe summarizing the clusters created by overlaps
+#' from a GRangesList where each element is only in one cluster
+#'
+#' @param myGRsToOverlap a GRangesList with items to overlap
+#' @return A dataframe with one column per item in the list with colnames identicals to names of the input
+#' each row is a cluster of overlapping items
+#' each value is a vector with the indices of the items in the cluster.
+#' @importFrom GenomicRanges findOverlaps
+#' @importFrom igraph graph_from_edgelist vcount add_vertices components
+#' @export
+#' @examples
+#'gr1 <- GenomicRanges::GRanges(seqnames = "chr1",
+#'ranges = IRanges::IRanges(start = c(1, 11, 199),
+#'                          end = c(10, 12, 200)),
+#'score = c(20, 30, 100))
+#'gr2 <- GenomicRanges::GRanges(seqnames = "chr1",
+#'                              ranges = IRanges::IRanges(start = c(5, 101),
+#'                                                        end = c(15, 102)),
+#'                              score = c(1, 2))
+#'gr3 <- GenomicRanges::GRanges(seqnames = "chr1",
+#'                              ranges = IRanges::IRanges(start = c(1, 100),
+#'                                                        end = c(4, 120)),
+#'                              score = c(10, 20))
+#'grL <- list(first = gr1, second = gr2, third = gr3)
+#'findOverlapAsClusters(grL)
+findOverlapAsClusters <- function(myGRsToOverlap){
+  # From Seurat:
+  # determine pairwise combinations
+  combinations <- expand.grid(1:(length(x = myGRsToOverlap)),
+                              1:(length(x = myGRsToOverlap)))
+  combinations <- combinations[combinations$Var1 < combinations$Var2,
+                               , drop = FALSE]
+  # determine the proper offsets
+  nitems <- sapply(X = myGRsToOverlap, FUN = length)
+  breaksItems <- as.vector(x = cumsum(x = c(0, nitems)))
+  offsets <- breaksItems[1:length(x = nitems)]
+  # We are now building a network
+  # First define edges (overlaps)
+  all.overlaps <- lapply(1:nrow(combinations), function(row){
+    i <- combinations[row, 1]
+    j <- combinations[row, 2]
+    ov <- as.data.frame(GenomicRanges::findOverlaps(myGRsToOverlap[[i]],
+                                                    myGRsToOverlap[[j]]))
+    ov[, 1] <- ov[, 1] + offsets[i]
+    ov[, 2] <- ov[, 2] + offsets[j]
+    return(ov)
+  })
+  all.overlaps <- do.call(rbind, all.overlaps)
+  # Building the network
+  network <- igraph::graph_from_edgelist(as.matrix(all.overlaps),
+                                         directed = FALSE)
+  nvertices.to.add <- sum(nitems) - igraph::vcount(network)
+  network <- igraph::add_vertices(network,
+                                  nv = nvertices.to.add)
+  # Cut the network in connected clusters
+  cluster <- igraph::components(network)
+  # Make a list where each element is a vector
+  # with all items of the cluster
+  clusterList <- aggregate(list(id = 1:sum(nitems)),
+                           by = list(clusterid = cluster$membership),
+                           FUN = c)$id
+  # Split the members of the cluster per gr origin
+  clusterListByGR <- sapply(clusterList, function(v){
+    split(x = v,
+          f = cut(x = v,
+                  breaks = breaksItems,
+                  labels = names(myGRsToOverlap)))
+  })
+
+  clusterListWOoffsets <- lapply(1:length(offsets), function(i){
+    return(sapply(clusterListByGR[i, ], "-", offsets[i]))
+  })
+
+  # Convert it to data.frame
+  clusterListAsDF <- as.data.frame(do.call(cbind,
+                                           clusterListWOoffsets))
+  colnames(clusterListAsDF) <- names(myGRsToOverlap)
+
+  return(clusterListAsDF)
 }
